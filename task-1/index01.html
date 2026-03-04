@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration System</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        header {
+            background: #2f4f88;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        header p {
+            margin-top: 8px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 30px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            width: 420px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #2f4f88;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .btn {
+            margin-top: 15px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .primary {
+            background: #2f4f88;
+            color: white;
+        }
+
+        .danger {
+            background: #e53935;
+            color: white;
+        }
+
+        .success {
+            background: #43a047;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #2f4f88;
+            color: white;
+        }
+
+        .query-box {
+            background: #f1f3f6;
+            padding: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #2f4f88;
+            font-family: monospace;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Student Registration System</h1>
+    <p>HTML5 Registration Form with Database Simulation</p>
+</header>
+
+<div class="main">
+
+    <!-- Registration Form -->
+    <div class="card">
+        <h2>Student Registration Form</h2>
+
+        <form id="studentForm">
+            <label>Full Name *</label>
+            <input type="text" id="name" required>
+
+            <label>Email Address *</label>
+            <input type="email" id="email" required>
+
+            <label>Date of Birth *</label>
+            <input type="date" id="dob" required>
+
+            <label>Department *</label>
+            <select id="department" required>
+                <option value="">Select Department</option>
+                <option>CSE</option>
+                <option>ECE</option>
+                <option>EEE</option>
+                <option>IT</option>
+                <option>MECH</option>
+            </select>
+
+            <label>Phone Number *</label>
+            <input type="tel" id="phone" required>
+
+            <button type="submit" class="btn primary">Register Student</button>
+            <button type="reset" class="btn danger">Clear Form</button>
+        </form>
+    </div>
+
+    <!-- Database Section -->
+    <div class="card">
+        <h2>Student Database</h2>
+
+        <p>Registered students are stored in a simulated database table and can be retrieved using SELECT query.</p>
+
+        <button class="btn success" onclick="loadStudents()">Load Students (SELECT *)</button>
+        <button class="btn danger" onclick="clearDatabase()">Clear Database</button>
+
+        <div class="query-box">
+            <strong>Simulated SQL Query:</strong><br>
+            SELECT * FROM students;
+        </div>
+
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>DOB</th>
+                    <th>Department</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="6">No student data loaded.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<footer>
+    Student Registration System © 2023 | HTML5 Form with Database Simulation <br>
+    Data is stored locally using browser's localStorage (simulating database storage)
+</footer>
+
+<script>
+    const form = document.getElementById("studentForm");
+    const tableBody = document.querySelector("#studentTable tbody");
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const student = {
+            id: Date.now(),
+            name: name.value,
+            email: email.value,
+            dob: dob.value,
+            department: department.value,
+            phone: phone.value
+        };
+
+        let students = JSON.parse(localStorage.getItem("students")) || [];
+        students.push(student);
+        localStorage.setItem("students", JSON.stringify(students));
+
+        alert("Student Registered Successfully!");
+        form.reset();
+    });
+
+    function loadStudents() {
+        let students = JSON.parse(localStorage.getItem("students")) || [];
+        tableBody.innerHTML = "";
+
+        if (students.length === 0) {
+            tableBody.innerHTML = "<tr><td colspan='6'>No student data loaded.</td></tr>";
+            return;
+        }
+
+        students.forEach((s, index) => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>${s.dob}</td>
+                    <td>${s.department}</td>
+                    <td>${s.phone}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function clearDatabase() {
+        localStorage.removeItem("students");
+        loadStudents();
+        alert("Database Cleared!");
+    }
+</script>
+
+</body>
+</html>

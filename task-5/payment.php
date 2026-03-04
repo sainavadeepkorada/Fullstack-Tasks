@@ -1,0 +1,155 @@
+<?php
+$conn = mysqli_connect("localhost","root","","banking");
+
+if(!$conn){
+    die("Connection Failed: " . mysqli_connect_error());
+}
+
+$message = "";
+
+/* =========================
+   Handle Payment
+========================= */
+if(isset($_POST['pay'])){
+
+    $amount = $_POST['amount'];
+
+    mysqli_autocommit($conn, FALSE); // Start Transaction
+
+    try {
+
+        // Check User Balance
+        $result = mysqli_query($conn, "SELECT balance FROM accounts WHERE name='User_Account'");
+        $row = mysqli_fetch_assoc($result);
+        $userBalance = $row['balance'];
+
+        if($userBalance < $amount){
+            throw new Exception("Insufficient Balance!");
+        }
+
+        // Deduct from User
+        $deduct = mysqli_query($conn,
+            "UPDATE accounts 
+             SET balance = balance - $amount 
+             WHERE name='User_Account'"
+        );
+
+        if(!$deduct){
+            throw new Exception("Failed to deduct amount!");
+        }
+
+        // Add to Merchant
+        $add = mysqli_query($conn,
+            "UPDATE accounts 
+             SET balance = balance + $amount 
+             WHERE name='Merchant_Account'"
+        );
+
+        if(!$add){
+            throw new Exception("Failed to credit merchant!");
+        }
+
+        // If all successful
+        mysqli_commit($conn);
+        $message = "<p class='success'>Payment Successful! Transaction Committed.</p>";
+
+    } catch (Exception $e) {
+
+        mysqli_rollback($conn);
+        $message = "<p class='error'>Transaction Failed! Rolled Back.<br>".$e->getMessage()."</p>";
+    }
+
+    mysqli_autocommit($conn, TRUE);
+}
+
+/* =========================
+   Fetch Updated Balances
+========================= */
+$balances = mysqli_query($conn, "SELECT * FROM accounts");
+
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Online Payment Simulation</title>
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f9;
+    padding: 40px;
+}
+.container {
+    width: 500px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+h2 {
+    text-align: center;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+button {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    background: #2f4f88;
+    color: white;
+    border: none;
+}
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+.success {
+    color: green;
+}
+.error {
+    color: red;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Online Payment Simulation</h2>
+
+    <?= $message ?>
+
+    <form method="POST">
+        <label>Enter Amount to Pay:</label>
+        <input type="number" name="amount" required>
+        <button type="submit" name="pay">Make Payment</button>
+    </form>
+
+    <h3>Account Balances</h3>
+
+    <table>
+        <tr>
+            <th>Account</th>
+            <th>Balance</th>
+        </tr>
+
+        <?php while($row = mysqli_fetch_assoc($balances)) { ?>
+        <tr>
+            <td><?= $row['name'] ?></td>
+            <td>₹<?= $row['balance'] ?></td>
+        </tr>
+        <?php } ?>
+    </table>
+</div>
+
+</body>
+</html>

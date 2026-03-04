@@ -1,0 +1,160 @@
+<?php
+
+/* ======================
+   Database Connection
+====================== */
+$conn = mysqli_connect("localhost","root","","ecommerce");
+
+if(!$conn){
+    die("Connection Failed: " . mysqli_connect_error());
+}
+
+
+/* ======================
+   JOIN QUERY – Order History
+====================== */
+$orderQuery = "
+SELECT 
+    c.name AS customer,
+    p.product_name,
+    o.quantity,
+    p.price,
+    (o.quantity * p.price) AS total_amount,
+    o.order_date
+FROM Orders o
+JOIN Customers c ON o.customer_id = c.customer_id
+JOIN Products p ON o.product_id = p.product_id
+ORDER BY o.order_date DESC
+";
+
+$orderResult = mysqli_query($conn, $orderQuery);
+
+
+/* ======================
+   Subquery – Highest Value Order
+====================== */
+$highestQuery = "
+SELECT c.name, (o.quantity * p.price) AS total_amount
+FROM Orders o
+JOIN Customers c ON o.customer_id = c.customer_id
+JOIN Products p ON o.product_id = p.product_id
+WHERE (o.quantity * p.price) = (
+    SELECT MAX(o2.quantity * p2.price)
+    FROM Orders o2
+    JOIN Products p2 ON o2.product_id = p2.product_id
+)";
+$highestResult = mysqli_query($conn, $highestQuery);
+$highest = mysqli_fetch_assoc($highestResult);
+
+
+/* ======================
+   Subquery – Most Active Customer
+====================== */
+$activeQuery = "
+SELECT name FROM Customers
+WHERE customer_id = (
+    SELECT customer_id
+    FROM Orders
+    GROUP BY customer_id
+    ORDER BY COUNT(order_id) DESC
+    LIMIT 1
+)";
+$activeResult = mysqli_query($conn, $activeQuery);
+$active = mysqli_fetch_assoc($activeResult);
+
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>E-Commerce Order Dashboard</title>
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 30px;
+}
+h1 {
+    text-align: center;
+    color: #2f4f88;
+}
+.container {
+    width: 90%;
+    margin: auto;
+}
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+th {
+    background: #2f4f88;
+    color: white;
+}
+.highlight {
+    font-weight: bold;
+    color: green;
+}
+</style>
+</head>
+<body>
+
+<h1>E-Commerce Order Dashboard</h1>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Customer Order History (JOIN + ORDER BY)</h2>
+        <table>
+            <tr>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total Amount</th>
+                <th>Order Date</th>
+            </tr>
+            <?php while($row = mysqli_fetch_assoc($orderResult)) { ?>
+            <tr>
+                <td><?= $row['customer'] ?></td>
+                <td><?= $row['product_name'] ?></td>
+                <td><?= $row['quantity'] ?></td>
+                <td><?= $row['price'] ?></td>
+                <td><?= $row['total_amount'] ?></td>
+                <td><?= $row['order_date'] ?></td>
+            </tr>
+            <?php } ?>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Highest Value Order (Subquery)</h2>
+        <p class="highlight">
+            Customer: <?= $highest['name']; ?> <br>
+            Amount: ₹<?= $highest['total_amount']; ?>
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>Most Active Customer (Subquery + GROUP BY)</h2>
+        <p class="highlight">
+            <?= $active['name']; ?>
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Feedback Form</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f4f8;
+            padding: 40px;
+        }
+
+        .container {
+            width: 450px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        /* Highlight on hover */
+        input:hover, textarea:hover, select:hover {
+            border-color: #2f4f88;
+            background-color: #eef3ff;
+        }
+
+        .error {
+            color: red;
+            font-size: 13px;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #2f4f88;
+            color: white;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d315e;
+        }
+    </style>
+
+    <script>
+
+        // Reusable validation function
+        function showError(id, message) {
+            document.getElementById(id).innerHTML = message;
+        }
+
+        function clearError(id) {
+            document.getElementById(id).innerHTML = "";
+        }
+
+        // Name validation on keypress
+        function validateName() {
+            let name = document.getElementById("name").value;
+            let regex = /^[A-Za-z ]+$/;
+
+            if (!regex.test(name)) {
+                showError("nameError", "Only letters allowed");
+                return false;
+            } else {
+                clearError("nameError");
+                return true;
+            }
+        }
+
+        // Email validation on keypress
+        function validateEmail() {
+            let email = document.getElementById("email").value;
+            let pattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+            if (!pattern.test(email)) {
+                showError("emailError", "Enter valid email");
+                return false;
+            } else {
+                clearError("emailError");
+                return true;
+            }
+        }
+
+        // Feedback validation
+        function validateFeedback() {
+            let feedback = document.getElementById("feedback").value;
+
+            if (feedback.length < 10) {
+                showError("feedbackError", "Minimum 10 characters required");
+                return false;
+            } else {
+                clearError("feedbackError");
+                return true;
+            }
+        }
+
+        // Double-click submit confirmation
+        function submitForm() {
+
+            if (validateName() && validateEmail() && validateFeedback()) {
+                document.getElementById("confirmation").innerHTML =
+                    "✅ Thank you! Your feedback has been submitted successfully.";
+            } else {
+                document.getElementById("confirmation").innerHTML =
+                    "❌ Please correct the errors before submitting.";
+            }
+        }
+
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Customer Feedback Form</h2>
+
+    <label>Name:</label>
+    <input type="text" id="name" onkeyup="validateName()">
+    <div id="nameError" class="error"></div>
+
+    <label>Email:</label>
+    <input type="text" id="email" onkeyup="validateEmail()">
+    <div id="emailError" class="error"></div>
+
+    <label>Rating:</label>
+    <select>
+        <option>Excellent</option>
+        <option>Good</option>
+        <option>Average</option>
+        <option>Poor</option>
+    </select>
+
+    <label>Feedback:</label>
+    <textarea id="feedback" rows="4" onkeyup="validateFeedback()"></textarea>
+    <div id="feedbackError" class="error"></div>
+
+    <!-- Double click event -->
+    <button ondblclick="submitForm()">Double Click to Submit</button>
+
+    <div id="confirmation" class="success"></div>
+
+</div>
+
+</body>
+</html>
