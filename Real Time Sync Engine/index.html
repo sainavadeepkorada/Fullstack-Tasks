@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Real-Time Event Synchronization Engine</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    // Session guard — redirect to login if not authenticated
+    (function() {
+      const session = sessionStorage.getItem('syncengine_session');
+      if (!session) { window.location.href = 'login.html'; }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <div>
+          <h1>SyncEngine</h1>
+          <p class="subtitle">Real-Time Event Synchronization Engine</p>
+        </div>
+      </div>
+      <div class="status-bar">
+        <span class="status-dot" id="engineStatus"></span>
+        <span id="engineStatusText">Engine Offline</span>
+        <span class="version-tag">v1.0 · Undergraduate Project</span>
+        <span class="user-pill" id="userPill">Navadeep[Developer]</span>
+        <button class="btn-logout" onclick="logoutUser()"> Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <main class="main-grid">
+
+    <!-- LEFT: CONTROL PANEL -->
+    <section class="panel control-panel">
+      <h2 class="panel-title"> Control Panel</h2>
+
+      <div class="card">
+        <h3>Engine Controls</h3>
+        <div class="btn-group">
+          <button class="btn btn-start" id="startBtn" onclick="startEngine()">▶ Start Engine</button>
+          <button class="btn btn-stop" id="stopBtn" onclick="stopEngine()" disabled>⏹ Stop Engine</button>
+          <button class="btn btn-reset" onclick="resetAll()"> Reset All</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Publish Event</h3>
+        <label>Event Type</label>
+        <select id="eventType">
+          <option value="USER_LOGIN">USER_LOGIN</option>
+          <option value="DATA_UPDATE">DATA_UPDATE</option>
+          <option value="PAYMENT_PROCESSED">PAYMENT_PROCESSED</option>
+          <option value="NOTIFICATION">NOTIFICATION</option>
+          <option value="ERROR_ALERT">ERROR_ALERT</option>
+          <option value="SYSTEM_HEALTH">SYSTEM_HEALTH</option>
+        </select>
+
+        <label>Event Payload (JSON)</label>
+        <textarea id="eventPayload" rows="3">{ "userId": "U-001", "data": "sample" }</textarea>
+
+        <label>Priority Level</label>
+        <select id="eventPriority">
+          <option value="LOW">🟢 LOW</option>
+          <option value="MEDIUM" selected>🟡 MEDIUM</option>
+          <option value="HIGH">🔴 HIGH</option>
+        </select>
+
+        <button class="btn btn-publish" onclick="publishEvent()"> Publish Event</button>
+      </div>
+
+      <div class="card">
+        <h3>Subscriber Management</h3>
+        <input type="text" id="subscriberName" placeholder="Subscriber name (e.g. ServiceA)" />
+        <select id="subscriberTopic">
+          <option value="USER_LOGIN">USER_LOGIN</option>
+          <option value="DATA_UPDATE">DATA_UPDATE</option>
+          <option value="PAYMENT_PROCESSED">PAYMENT_PROCESSED</option>
+          <option value="NOTIFICATION">NOTIFICATION</option>
+          <option value="ERROR_ALERT">ERROR_ALERT</option>
+          <option value="SYSTEM_HEALTH">SYSTEM_HEALTH</option>
+        </select>
+        <div class="btn-group">
+          <button class="btn btn-sub" onclick="addSubscriber()"> Subscribe</button>
+          <button class="btn btn-unsub" onclick="removeSubscriber()"> Unsubscribe</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MIDDLE: EVENT QUEUE + LOG -->
+    <section class="panel middle-panel">
+      <h2 class="panel-title"> Event Queue</h2>
+
+      <div class="queue-header">
+        <span id="queueCount" class="badge">0 Events</span>
+        <span id="processedCount" class="badge badge-green">0 Processed</span>
+        <span id="droppedCount" class="badge badge-red">0 Dropped</span>
+      </div>
+
+      <div class="queue-container" id="eventQueue">
+        <div class="empty-state">No events in queue. Start the engine and publish events!</div>
+      </div>
+
+      <h2 class="panel-title" style="margin-top:20px"> Event Log</h2>
+      <div class="log-toolbar">
+        <button class="btn-small" onclick="clearLog()"> Clear Log</button>
+        <button class="btn-small" onclick="exportLog()"> Export Log</button>
+      </div>
+      <div class="log-container" id="eventLog">
+        <div class="log-entry log-info">[SYSTEM] SyncEngine initialized. Click "Start Engine" to begin.</div>
+      </div>
+    </section>
+
+    <!-- RIGHT: SUBSCRIBERS + STATS -->
+    <section class="panel right-panel">
+      <h2 class="panel-title"> Active Subscribers</h2>
+      <div id="subscriberList" class="subscriber-list">
+        <div class="empty-state">No subscribers yet.</div>
+      </div>
+
+      <h2 class="panel-title" style="margin-top:20px"> Live Statistics</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="statPublished">0</div>
+          <div class="stat-label">Published</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statDelivered">0</div>
+          <div class="stat-label">Delivered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statSubscribers">0</div>
+          <div class="stat-label">Subscribers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statUptime">0s</div>
+          <div class="stat-label">Uptime</div>
+        </div>
+      </div>
+
+      <h2 class="panel-title" style="margin-top:20px"> Event Distribution</h2>
+      <div id="eventChart" class="event-chart"></div>
+
+      <h2 class="panel-title" style="margin-top:20px"> Delivered Events</h2>
+      <div id="deliveryLog" class="delivery-log">
+        <div class="empty-state">No deliveries yet.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p>
+      Real-Time Event Synchronization Engine &nbsp;|&nbsp;
+      Navadeep Project &nbsp;|&nbsp;
+      <strong>Made with HTML,CSS and JavaScript</strong> &nbsp;|&nbsp;
+      
+    </p>
+  </footer>
+
+  <!-- Link JavaScript -->
+  <script src="script.js"></script>
+  <script>
+    // Load session info into header
+    (function() {
+      const raw = sessionStorage.getItem("syncengine_session");
+      if (raw) {
+        const s = JSON.parse(raw);
+        const pill = document.getElementById("userPill");
+        if (pill) pill.textContent =  s.name + " [" + s.role + "]";
+      }
+    })();
+    function logoutUser() {
+      sessionStorage.removeItem("syncengine_session");
+      window.location.href = "login.html";
+    }
+  </script>
+
+</body>
+</html>

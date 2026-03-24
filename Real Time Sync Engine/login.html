@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — SyncEngine</title>
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+
+  <!-- Animated background particles -->
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <!-- Login Card -->
+  <div class="login-wrapper">
+
+    <div class="login-card" id="loginCard">
+
+      <!-- Logo -->
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <h1 class="brand-name">SyncEngine</h1>
+        <p class="brand-sub">Real-Time Event Synchronization Engine</p>
+        <span class="brand-tag">Navadeep Project</span>
+      </div>
+
+      <!-- Toggle: Login / Register -->
+      <div class="tab-toggle">
+        <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- ===== LOGIN FORM ===== -->
+      <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+        <div class="field-group">
+          <label for="loginUser">Username</label>
+          <div class="input-wrap">
+            
+            <input type="text" id="loginUser" placeholder="Enter your username" autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="loginPass">Password</label>
+          <div class="input-wrap">
+            
+            <input type="password" id="loginPass" placeholder="Enter your password" autocomplete="current-password" />
+            <button type="button" class="toggle-pw" onclick="togglePassword('loginPass', this)">👁</button>
+          </div>
+        </div>
+
+        <div class="row-between">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe" />
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="link-muted" onclick="showForgot()">Forgot password?</a>
+        </div>
+
+        <div class="error-box" id="loginError"></div>
+
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-loader" id="loginLoader" style="display:none"></span>
+        </button>
+
+        <div class="demo-hint">
+          <strong>Demo credentials:</strong> admin / admin123 &nbsp;|&nbsp; user / user123
+        </div>
+      </form>
+
+      <!-- ===== REGISTER FORM ===== -->
+      <form class="auth-form hidden" id="registerForm" onsubmit="handleRegister(event)">
+        <div class="field-group">
+          <label for="regFullName">Full Name</label>
+          <div class="input-wrap">
+
+            <input type="text" id="regFullName" placeholder="Your full name" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="regUser">Username</label>
+          <div class="input-wrap">
+
+            <input type="text" id="regUser" placeholder="Choose a username" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="regEmail">Email</label>
+          <div class="input-wrap">
+
+            <input type="email" id="regEmail" placeholder="your@email.com" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="regPass">Password</label>
+          <div class="input-wrap">
+ 
+            <input type="password" id="regPass" placeholder="Min 6 characters" />
+            <button type="button" class="toggle-pw" onclick="togglePassword('regPass', this)">👁</button>
+          </div>
+          <div class="strength-bar-wrap" id="strengthWrap">
+            <div class="strength-bar" id="strengthBar"></div>
+          </div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+
+        <div class="field-group">
+          <label for="regConfirm">Confirm Password</label>
+          <div class="input-wrap">
+
+            <input type="password" id="regConfirm" placeholder="Repeat password" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="regRole">Role</label>
+          <div class="input-wrap">
+
+            <select id="regRole">
+              <option value="Developer">Developer</option>
+              <option value="Admin">Admin</option>
+              <option value="Viewer">Viewer</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="error-box" id="registerError"></div>
+        <div class="success-box hidden" id="registerSuccess"></div>
+
+        <button type="submit" class="btn-login">
+          <span class="btn-text">Create Account</span>
+        </button>
+      </form>
+
+    </div>
+
+    <!-- Footer note -->
+    <p class="footer-note">
+      HTML &nbsp;·&nbsp; CSS &nbsp;·&nbsp; JavaScript &nbsp;·&nbsp;
+      VS Code Live Server &nbsp;·&nbsp; Navadeep Project
+    </p>
+  </div>
+
+  <script src="login.js"></script>
+
+</body>
+</html>
