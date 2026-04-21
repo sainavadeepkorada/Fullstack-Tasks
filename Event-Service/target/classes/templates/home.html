@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Events – Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f4f1eb;
+        }
+        
+        .navbar {
+            background: #1a1a2e;
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+        }
+        
+        .logo span {
+            color: #e8a045;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .nav-links a.active {
+            background: #e8a045;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #e8a045;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            padding: 8px 18px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        
+        .hero {
+            background: #1a1a2e;
+            color: white;
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .filter-bar {
+            background: #1a1a2e;
+            padding: 15px 40px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .filter-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.7);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: #e8a045;
+            border-color: #e8a045;
+            color: white;
+        }
+        
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px 20px;
+            margin: 20px 30px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px 20px;
+            margin: 20px 30px;
+            border-radius: 10px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .main-content {
+            display: flex;
+            padding: 30px;
+            gap: 30px;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 80px;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+        
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .sidebar-item {
+            padding: 10px 12px;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        
+        .sidebar-item:hover {
+            background: #fef3e2;
+        }
+        
+        .events-container {
+            flex: 1;
+        }
+        
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .event-count {
+            background: #e8a045;
+            padding: 8px 18px;
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .view-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-btn {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .view-btn.active {
+            background: #1a1a2e;
+            color: white;
+            border-color: #1a1a2e;
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+        }
+        
+        .events-list {
+            display: block;
+        }
+        
+        .events-list .event-card {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .events-list .event-color-bar {
+            width: 8px;
+            height: auto;
+        }
+        
+        .event-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .event-color-bar {
+            height: 6px;
+        }
+        
+        .event-content {
+            padding: 20px;
+        }
+        
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .event-date {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .event-tag {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .tag-Tech { background: #dbeafe; color: #1e40af; }
+        .tag-Cultural { background: #fce7f3; color: #9d174d; }
+        .tag-Sports { background: #dcfce7; color: #166534; }
+        .tag-Workshop { background: #ede9fe; color: #5b21b6; }
+        .tag-Social { background: #fef9c3; color: #854d0e; }
+        
+        .event-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1a1a2e;
+        }
+        
+        .event-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .event-location {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .event-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .rsvp-count {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .rsvp-btn {
+            padding: 8px 20px;
+            background: #e8a045;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .rsvp-btn:hover {
+            background: #d48a2b;
+        }
+        
+        .rsvp-btn.cancelled {
+            background: #dc3545;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #e8a045;
+        }
+        
+        .submit-btn {
+            background: #e8a045;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero {
+                text-align: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">Campus<span>Events</span></div>
+        <div class="nav-links">
+            <a class="active" onclick="showAllEvents()">Dashboard</a>
+            <a onclick="showMyRsvps()">My RSVPs</a>
+            <a id="createEventNav" style="display: none;" onclick="showCreateForm()">Create Event</a>
+        </div>
+        <div class="user-info">
+            <span>Hello, <strong id="userName">User</strong></span>
+            <div class="avatar" id="userAvatar">U</div>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero" id="heroSection">
+        <div>
+            <h1>Upcoming Campus Events</h1>
+            <p>Explore, RSVP, and make the most of your campus life</p>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-box">
+                <div class="stat-number" id="totalEventsCount">0</div>
+                <div>Total Events</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">5</div>
+                <div>Categories</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="myRsvpCount">0</div>
+                <div>My RSVPs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messageContainer"></div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" onclick="filterEvents('All')">All Events</button>
+        <button class="filter-btn" onclick="filterEvents('Tech')">Tech</button>
+        <button class="filter-btn" onclick="filterEvents('Cultural')">Cultural</button>
+        <button class="filter-btn" onclick="filterEvents('Sports')">Sports</button>
+        <button class="filter-btn" onclick="filterEvents('Workshop')">Workshop</button>
+        <button class="filter-btn" onclick="filterEvents('Social')">Social</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Browse</div>
+                <div class="sidebar-item" onclick="showAllEvents()">📅 All Events</div>
+                <div class="sidebar-item" onclick="showMyRsvps()">✅ My RSVPs</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Categories</div>
+                <div class="sidebar-item" onclick="filterEvents('Tech')">💻 Tech</div>
+                <div class="sidebar-item" onclick="filterEvents('Cultural')">🎭 Cultural</div>
+                <div class="sidebar-item" onclick="filterEvents('Sports')">⚽ Sports</div>
+                <div class="sidebar-item" onclick="filterEvents('Workshop')">🔧 Workshop</div>
+                <div class="sidebar-item" onclick="filterEvents('Social')">🤝 Social</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Quick Actions</div>
+                <div class="sidebar-item" id="createEventSidebar" style="display: none;" onclick="showCreateForm()">➕ Create Event</div>
+                <div class="sidebar-item" onclick="showAllEvents()">🔄 Refresh Events</div>
+            </div>
+        </div>
+
+        <!-- Events Container -->
+        <div class="events-container">
+            <div class="events-header">
+                <h2 id="pageTitle">All Events</h2>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div class="event-count" id="eventCount">0 Events</div>
+                    <div class="view-buttons">
+                        <button class="view-btn active" onclick="setGridView()">📱 Grid</button>
+                        <button class="view-btn" onclick="setListView()">📋 List</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="eventsContainer">Loading events...</div>
+        </div>
+    </div>
+
+    <script>
+        // Pass data from server via Thymeleaf
+        let currentUserRole = /*[[${user.role}]]*/ 'STUDENT';
+        let currentUserId = /*[[${user.id}]]*/ 2;
+        let currentUserName = /*[[${user.fullName}]]*/ 'User';
+        
+        // Set user info
+        document.getElementById('userName').innerText = currentUserName;
+        document.getElementById('userAvatar').innerText = currentUserName.charAt(0);
+        
+        // Show create event button for admin
+        if (currentUserRole === 'ADMIN') {
+            document.getElementById('createEventNav').style.display = 'inline-block';
+            document.getElementById('createEventSidebar').style.display = 'block';
+        }
+        
+        let allEvents = [];
+        let userRsvps = [];
+        let currentView = 'grid';
+        let currentFilter = 'All';
+        
+        // Load events on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEvents();
+            loadMyRsvps();
+        });
+        
+        // Load all events from server
+        function loadEvents() {
+            fetch('/api/events')
+                .then(response => response.json())
+                .then(events => {
+                    allEvents = events;
+                    updateEventCounts();
+                    renderEvents();
+                })
+                .catch(error => {
+                    console.error('Error loading events:', error);
+                    document.getElementById('eventsContainer').innerHTML = '<div class="empty-state">❌ Error loading events. Please refresh the page.</div>';
+                });
+        }
+        
+        // Load user's RSVPs
+        function loadMyRsvps() {
+            fetch('/api/my-rsvps')
+                .then(response => response.json())
+                .then(rsvps => {
+                    userRsvps = rsvps;
+                    document.getElementById('myRsvpCount').innerText = userRsvps.length;
+                    if (document.getElementById('pageTitle').innerText === 'My RSVPs') {
+                        renderMyRsvps();
+                    }
+                })
+                .catch(error => console.error('Error loading RSVPs:', error));
+        }
+        
+        // Toggle RSVP
+        function toggleRsvp(eventId, button) {
+            fetch('/events/' + eventId + '/rsvp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.text())
+            .then(message => {
+                showMessage(message, 'success');
+                loadEvents();
+                loadMyRsvps();
+            })
+            .catch(error => {
+                showMessage('Error processing RSVP', 'error');
+            });
+        }
+        
+        // Render events based on current filter and view
+        function renderEvents() {
+            let filteredEvents = allEvents;
+            if (currentFilter !== 'All') {
+                filteredEvents = allEvents.filter(event => event.tag === currentFilter);
+            }
+            
+            const container = document.getElementById('eventsContainer');
+            document.getElementById('eventCount').innerHTML = filteredEvents.length + ' Events';
+            document.getElementById('totalEventsCount').innerHTML = allEvents.length;
+            
+            if (filteredEvents.length === 0) {
+                container.innerHTML = '<div class="empty-state">📭 No events found in this category</div>';
+                return;
+            }
+            
+            if (currentView === 'grid') {
+                container.className = 'events-grid';
+            } else {
+                container.className = 'events-list';
+            }
+            
+            let html = '';
+            for (let event of filteredEvents) {
+                const isRsvped = userRsvps.some(rsvp => rsvp.id === event.id || rsvp.eventId === event.id);
+                const rsvpCount = event.rsvpCount || 0;
+                
+                html += `
+                    <div class="event-card" data-tag="${event.tag}">
+                        <div class="event-color-bar" style="background: ${event.accentColor || '#e8a045'}"></div>
+                        <div class="event-content">
+                            <div class="event-header">
+                                <span class="event-date">📅 ${event.eventDate}</span>
+                                <span class="event-tag tag-${event.tag}">${event.tag}</span>
+                            </div>
+                            <h3 class="event-title">${escapeHtml(event.title)}</h3>
+                            <p class="event-desc">${escapeHtml(event.description)}</p>
+                            <div class="event-location">📍 ${escapeHtml(event.location)}</div>
+                            <div class="event-footer">
+                                <span class="rsvp-count">👥 ${rsvpCount} going</span>
+                                <button class="rsvp-btn ${isRsvped ? 'cancelled' : ''}" 
+                                        onclick="toggleRsvp(${event.id}, this)">
+                                    ${isRsvped ? 'Cancel RSVP' : 'RSVP Now'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+        
+        // Render My RSVPs only
+        function renderMyRsvps() {
+            const container = document.getElementById('eventsContainer');
+            document.getElementById('pageTitle').innerHTML = 'My RSVPs';
+            document.getElementById('filterBar').style.display = 'none';
+            
+            if (userRsvps.length === 0) {
+                container.innerHTML = '<div class="empty-state">📭 You haven\'t RSVP\'d to any events yet. Browse events and click RSVP!</div>';
+                document.getElementById('eventCount').innerHTML = '0 Events';
+                return;
+            }
+            
+            if (currentView === 'grid') {
+                container.className = 'events-grid';
+            } else {
+                container.className = 'events-list';
+            }
+            
+            let html = '';
+            for (let event of userRsvps) {
+                html += `
+                    <div class="event-card">
+                        <div class="event-color-bar" style="background: ${event.accentColor || '#e8a045'}"></div>
+                        <div class="event-content">
+                            <div class="event-header">
+                                <span class="event-date">📅 ${event.eventDate}</span>
+                                <span class="event-tag tag-${event.tag}">${event.tag}</span>
+                            </div>
+                            <h3 class="event-title">${escapeHtml(event.title)}</h3>
+                            <p class="event-desc">${escapeHtml(event.description)}</p>
+                            <div class="event-location">📍 ${escapeHtml(event.location)}</div>
+                            <div class="event-footer">
+                                <span class="rsvp-count">✅ You have RSVP\'d</span>
+                                <button class="rsvp-btn cancelled" onclick="toggleRsvp(${event.id}, this)">
+                                    Cancel RSVP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            document.getElementById('eventCount').innerHTML = userRsvps.length + ' Events';
+        }
+        
+        // Show All Events
+        function showAllEvents() {
+            currentFilter = 'All';
+            document.getElementById('pageTitle').innerHTML = 'All Events';
+            document.getElementById('filterBar').style.display = 'flex';
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText === 'All Events') btn.classList.add('active');
+            });
+            renderEvents();
+        }
+        
+        // Show My RSVPs
+        function showMyRsvps() {
+            document.getElementById('pageTitle').innerHTML = 'My RSVPs';
+            document.getElementById('filterBar').style.display = 'none';
+            renderMyRsvps();
+        }
+        
+        // Filter Events
+        function filterEvents(tag) {
+            currentFilter = tag;
+            document.getElementById('pageTitle').innerHTML = tag === 'All' ? 'All Events' : tag + ' Events';
+            document.getElementById('filterBar').style.display = 'flex';
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText === tag || (tag === 'All' && btn.innerText === 'All Events')) {
+                    btn.classList.add('active');
+                }
+            });
+            renderEvents();
+        }
+        
+        // Show Create Event Form
+        function showCreateForm() {
+            if (currentUserRole !== 'ADMIN') {
+                showMessage('Only administrators can create events', 'error');
+                return;
+            }
+            
+            const container = document.getElementById('eventsContainer');
+            document.getElementById('pageTitle').innerHTML = 'Create New Event';
+            document.getElementById('filterBar').style.display = 'none';
+            document.getElementById('eventCount').innerHTML = '';
+            
+            container.innerHTML = `
+                <div class="form-container">
+                    <h3 style="margin-bottom: 20px;">📝 Event Details</h3>
+                    <form id="createEventForm" onsubmit="event.preventDefault(); createEvent();">
+                        <div class="form-group">
+                            <label>Event Title *</label>
+                            <input type="text" id="title" required placeholder="Enter event title">
+                        </div>
+                        <div class="form-group">
+                            <label>Description *</label>
+                            <textarea id="description" rows="3" required placeholder="Describe the event"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Event Date *</label>
+                            <input type="text" id="eventDate" required placeholder="e.g., April 22, 2026">
+                        </div>
+                        <div class="form-group">
+                            <label>Location *</label>
+                            <input type="text" id="location" required placeholder="Event location">
+                        </div>
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select id="tag" required>
+                                <option value="">Select Category</option>
+                                <option value="Tech">Tech</option>
+                                <option value="Cultural">Cultural</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Social">Social</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <input type="text" id="accentColor" placeholder="#378ADD">
+                        </div>
+                        <button type="submit" class="submit-btn">✨ Create Event</button>
+                    </form>
+                </div>
+            `;
+        }
+        
+        // Create Event
+        function createEvent() {
+            const eventData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                eventDate: document.getElementById('eventDate').value,
+                location: document.getElementById('location').value,
+                tag: document.getElementById('tag').value,
+                accentColor: document.getElementById('accentColor').value || '#e8a045'
+            };
+            
+            fetch('/api/events/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(eventData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('Event created successfully!', 'success');
+                loadEvents();
+                showAllEvents();
+            })
+            .catch(error => {
+                showMessage('Error creating event', 'error');
+            });
+        }
+        
+        // Set Grid View
+        function setGridView() {
+            currentView = 'grid';
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (document.getElementById('pageTitle').innerHTML === 'My RSVPs') {
+                renderMyRsvps();
+            } else {
+                renderEvents();
+            }
+        }
+        
+        // Set List View
+        function setListView() {
+            currentView = 'list';
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (document.getElementById('pageTitle').innerHTML === 'My RSVPs') {
+                renderMyRsvps();
+            } else {
+                renderEvents();
+            }
+        }
+        
+        // Update event counts
+        function updateEventCounts() {
+            // Optional: Update category counts if needed
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            const className = type === 'success' ? 'success-msg' : 'error-msg';
+            container.innerHTML = `<div class="${className}">${type === 'success' ? '✅' : '❌'} ${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

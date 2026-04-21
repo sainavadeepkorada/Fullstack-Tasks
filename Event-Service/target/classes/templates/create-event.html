@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Event - Campus Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .color-preview {
+            width: 50px;
+            height: 40px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 2px solid #ddd;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+        
+        .tag-colors {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .required {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create New Event</h1>
+        <div class="subtitle">Add a new event to the campus calendar</div>
+        
+        <!-- Display error message if any -->
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+        
+        <form th:action="@{/events/create}" th:object="${event}" method="post">
+            <div class="form-group">
+                <label for="title">Event Title <span class="required">*</span></label>
+                <input type="text" id="title" name="title" th:field="*{title}" required placeholder="e.g., Tech Conference 2026">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description <span class="required">*</span></label>
+                <textarea id="description" name="description" th:field="*{description}" required placeholder="Describe the event..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="eventDate">Event Date <span class="required">*</span></label>
+                <input type="text" id="eventDate" name="eventDate" th:field="*{eventDate}" required placeholder="e.g., June 15, 2026">
+                <small style="color: #666; display: block; margin-top: 5px;">Format: Month Day, Year (e.g., April 22, 2026)</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location <span class="required">*</span></label>
+                <input type="text" id="location" name="location" th:field="*{location}" required placeholder="e.g., Main Auditorium">
+            </div>
+            
+            <div class="form-group">
+                <label for="tag">Category <span class="required">*</span></label>
+                <select id="tag" name="tag" th:field="*{tag}" required>
+                    <option value="">Select Category</option>
+                    <option value="Tech">Tech</option>
+                    <option value="Cultural">Cultural</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Social">Social</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="accentColor">Accent Color</label>
+                <input type="text" id="accentColor" name="accentColor" th:field="*{accentColor}" placeholder="#378ADD">
+                <div class="tag-colors">
+                    <div class="color-option" style="background:#378ADD" onclick="setColor('#378ADD')" title="Tech Blue"></div>
+                    <div class="color-option" style="background:#D4537E" onclick="setColor('#D4537E')" title="Cultural Pink"></div>
+                    <div class="color-option" style="background:#1D9E75" onclick="setColor('#1D9E75')" title="Tech Green"></div>
+                    <div class="color-option" style="background:#EF9F27" onclick="setColor('#EF9F27')" title="Social Orange"></div>
+                    <div class="color-option" style="background:#7C5CBF" onclick="setColor('#7C5CBF')" title="Workshop Purple"></div>
+                    <div class="color-option" style="background:#E24B4A" onclick="setColor('#E24B4A')" title="Sports Red"></div>
+                    <div class="color-option" style="background:#F39C12" onclick="setColor('#F39C12')" title="Workshop Yellow"></div>
+                    <div class="color-option" style="background:#3498DB" onclick="setColor('#3498DB')" title="Tech Light Blue"></div>
+                </div>
+                <small style="color: #666; display: block; margin-top: 5px;">Click on a color to select it</small>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn-submit">✨ Create Event</button>
+                <a href="/home" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        function setColor(color) {
+            document.getElementById('accentColor').value = color;
+            // Remove selected class from all color options
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // Add selected class to clicked option
+            event.target.classList.add('selected');
+        }
+        
+        // Auto-select color based on tag selection
+        document.getElementById('tag').addEventListener('change', function() {
+            const tag = this.value;
+            const colorMap = {
+                'Tech': '#378ADD',
+                'Cultural': '#D4537E',
+                'Sports': '#E24B4A',
+                'Workshop': '#7C5CBF',
+                'Social': '#EF9F27'
+            };
+            if (colorMap[tag]) {
+                document.getElementById('accentColor').value = colorMap[tag];
+                // Highlight the corresponding color option
+                document.querySelectorAll('.color-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.style.backgroundColor === colorMap[tag]) {
+                        opt.classList.add('selected');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
